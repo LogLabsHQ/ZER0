@@ -30,44 +30,52 @@ echo -e "${DIM}  ╚══════╝╚══════╝╚═╝  ╚�
 echo ""
 
 # ── Selector de idioma con flechas ────────────────────────────────────────────
-OPCIONES=("  Español" "  English")
+OPCIONES=("Español" "English")
 SELECTED=0
 
 draw_menu() {
-    tput cuu ${#OPCIONES[@]} 2>/dev/null || true
     for i in "${!OPCIONES[@]}"; do
+        tput el 2>/dev/null || true
         if [[ $i -eq $SELECTED ]]; then
             echo -e "  ${C}▶ ${W}${B}${OPCIONES[$i]}${RST}"
         else
             echo -e "  ${DIM}  ${OPCIONES[$i]}${RST}"
         fi
     done
+    tput cuu ${#OPCIONES[@]} 2>/dev/null || true
 }
 
 echo -e "  ${W}${B}Elige tu idioma / Choose your language:${RST}"
 echo ""
-for opt in "${OPCIONES[@]}"; do
-    echo -e "  ${DIM}  $opt${RST}"
-done
 
 tput civis 2>/dev/null || true   # ocultar cursor
 
-draw_menu
+# Dibujar menú inicial
+for i in "${!OPCIONES[@]}"; do
+    if [[ $i -eq $SELECTED ]]; then
+        echo -e "  ${C}▶ ${W}${B}${OPCIONES[$i]}${RST}"
+    else
+        echo -e "  ${DIM}  ${OPCIONES[$i]}${RST}"
+    fi
+done
+tput cuu ${#OPCIONES[@]} 2>/dev/null || true
 
 while true; do
     IFS= read -rsn1 key
     if [[ $key == $'\x1b' ]]; then
         read -rsn2 -t 0.1 key2
         case "$key2" in
-            '[A') (( SELECTED > 0 )) && (( SELECTED-- )) ;;
-            '[B') (( SELECTED < ${#OPCIONES[@]}-1 )) && (( SELECTED++ )) ;;
+            '[A') (( SELECTED > 0 )) && (( SELECTED-- )) || true ;;
+            '[B') (( SELECTED < ${#OPCIONES[@]}-1 )) && (( SELECTED++ )) || true ;;
         esac
         draw_menu
-    elif [[ $key == "" ]]; then
+    elif [[ $key == "" || $key == $'\n' ]]; then
         break
     fi
 done
 
+# Bajar cursor al final del menú
+tput cud ${#OPCIONES[@]} 2>/dev/null || echo -e "\n"
 tput cnorm 2>/dev/null || true   # restaurar cursor
 echo ""
 
