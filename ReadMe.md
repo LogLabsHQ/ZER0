@@ -1,14 +1,12 @@
-
 <div align="center">
 
-```
   ██████╗ ███████╗██████╗  ██████╗ 
   ╚════██╗██╔════╝██╔══██╗██╔═████╗
    █████╔╝█████╗  ██████╔╝██║██╔██║
   ██╔═══╝ ██╔══╝  ██╔══██╗████╔╝██║
   ███████╗███████╗██║  ██║╚██████╔╝
   ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ 
-```
+
 
 **Gestor de alias de comandos para Arch Linux.**  
 Escribe menos. Haz más.
@@ -24,9 +22,16 @@ Escribe menos. Haz más.
 
 ## ¿Qué es ZER0?
 
-ZER0 es una herramienta de línea de comandos que te permite guardar alias personalizados para tus comandos más usados. En lugar de escribir `sudo pacman -Syu` cada vez, simplemente defines `zer0 add upd "sudo pacman -Syu"` y desde ese momento ejecutas `zer0 upd`.
+ZER0 es una herramienta de línea de comandos con **modo interactivo (REPL)**. Al abrirlo entras a una sesión propia con prompt estilo terminal donde ejecutas tus alias directamente, sin escribir `zero` cada vez.
 
-Al iniciar, ZER0 te pregunta tu nombre y lo recuerda en cada sesión. Cada vez que lo abras verás el banner con tu nombre y el branding de LogLabs.
+```
+[luis@ZER0 ~]$ upd
+[luis@ZER0 ~]$ list
+[luis@ZER0 ~]$ add gs "git status"
+[luis@ZER0 ~]$ exit
+```
+
+La primera vez que lo abras, ZER0 te pregunta tu nombre y lo recuerda en cada sesión.
 
 ---
 
@@ -56,80 +61,92 @@ source ~/.bashrc   # bash
 source ~/.zshrc    # zsh
 ```
 
-El instalador se encarga de todo:
+El instalador se encarga de todo automáticamente:
 
-- Copia `zer0` y `zero` a `~/.local/bin/` (siempre en tu PATH)
-- Agrega los alias `-Z` y `Z` a tu shell
-- Configura `.bashrc`, `.zshrc` y `config.fish` automáticamente
+- Copia `zero` a `~/.local/bin/` (siempre en tu PATH)
+- Agrega el alias `-Z` a tu shell
+- Exporta `Z=zero` para que `$Z` funcione como invocación
+- Soporta bash, zsh y fish
 
 ---
 
-## Uso
+## Cómo abrir ZER0
 
-Una vez instalado, puedes invocar ZER0 de cualquiera de estas formas desde **cualquier carpeta**:
+Desde cualquier carpeta de tu terminal escribe cualquiera de estos:
 
 ```bash
-zer0
 zero
-Z
 -Z
+$Z
 ```
 
-Todas abren la pantalla de bienvenida.
+Los tres abren el modo interactivo de ZER0.
 
 ---
 
-## Comandos
+## Modo interactivo
+
+Al abrir ZER0 entras a una sesión con tu propio prompt:
+
+```
+[tuusuario@ZER0 ~]$ 
+```
+
+Desde aquí escribes los comandos **sin prefijo**:
 
 | Comando | Descripción |
 |---|---|
-| `zer0` / `zero` / `Z` / `-Z` | Pantalla de bienvenida |
-| `zer0 list` | Listar todos los atajos guardados |
-| `zer0 add <atajo> <comando>` | Agregar o actualizar un atajo |
-| `zer0 rm <atajo>` | Eliminar un atajo |
-| `zer0 <atajo> [args…]` | Ejecutar un atajo |
-| `zer0 help` | Mostrar ayuda |
-| `zer0 version` | Mostrar versión |
+| `list` | Listar todos los atajos guardados |
+| `add <atajo> <cmd>` | Agregar o actualizar un atajo |
+| `rm <atajo>` | Eliminar un atajo |
+| `<atajo> [args…]` | Ejecutar un atajo |
+| `help` | Mostrar ayuda |
+| `version` | Mostrar versión |
+| `exit` / `quit` | Salir de ZER0 |
+
+También puedes salir con `Ctrl+C`.
 
 ---
 
 ## Ejemplos
 
 ```bash
-# Guardar atajos
-zer0 add upd  "sudo pacman -Syu"
-zer0 add cls  "clear"
-zer0 add gs   "git status"
-zer0 add gp   "git push origin main"
-zer0 add py   "python3"
+# Abrir ZER0
+zero
 
-# Ejecutarlos
-zer0 upd             # → sudo pacman -Syu
-zer0 gs              # → git status
-zer0 py script.py    # → python3 script.py  (pasa argumentos extra)
+# Dentro del prompt de ZER0:
+[luis@ZER0 ~]$ add upd "sudo pacman -Syu"
+[luis@ZER0 ~]$ add gs "git status"
+[luis@ZER0 ~]$ add gp "git push origin main"
+[luis@ZER0 ~]$ add py "python3"
+
+# Ejecutar atajos
+[luis@ZER0 ~]$ upd
+[luis@ZER0 ~]$ gs
+[luis@ZER0 ~]$ py script.py
 
 # Ver todos los atajos
-zer0 list
+[luis@ZER0 ~]$ list
 
-# Eliminar uno
-zer0 rm cls
+# Salir
+[luis@ZER0 ~]$ exit
 ```
 
 ---
 
 ## Configuración
 
-ZER0 guarda todo en un archivo JSON en:
+ZER0 guarda todo en:
 
 ```
 ~/.config/zer0/config.json
 ```
 
-Ejemplo del archivo:
+Ejemplo:
 
 ```json
 {
-  "name": "Tu Nombre",
+  "name": "Luis",
   "aliases": {
     "upd": "sudo pacman -Syu",
     "gs": "git status",
@@ -156,12 +173,11 @@ ZER0/
 ## Desinstalar
 
 ```bash
-rm ~/.local/bin/zer0
 rm ~/.local/bin/zero
 rm -rf ~/.config/zer0
 ```
 
-Y elimina manualmente el bloque `# ─── ZER0 ───` de tu `.bashrc` / `.zshrc`.
+Y elimina el bloque `# ─── ZER0 ───` de tu `.bashrc` / `.zshrc`.
 
 ---
 
