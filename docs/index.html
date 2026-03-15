@@ -59,6 +59,9 @@ nav{position:fixed;top:0;left:0;right:0;height:48px;background:rgba(10,10,10,.92
 .terminal-body{padding:1.5rem;font-size:13px;line-height:1.8}
 .t-comment{color:var(--dim)}.t-prompt{color:var(--green)}.t-cmd{color:var(--white)}.t-out{color:var(--cyan)}.t-success{color:var(--green)}
 .t-banner-r{color:var(--red)}.t-banner-o{color:var(--orange)}.t-banner-y{color:var(--yellow)}.t-banner-d{color:#2a2a2a}
+.t-learn{color:var(--yellow);font-style:italic}
+.t-search{color:var(--cyan)}
+.t-theme{color:var(--purple)}
 
 /* FEATURES */
 .features{padding:5rem 2rem;max-width:1100px;margin:0 auto}
@@ -70,6 +73,9 @@ nav{position:fixed;top:0;left:0;right:0;height:48px;background:rgba(10,10,10,.92
 .feature-icon{font-size:22px;margin-bottom:1rem}
 .feature-title{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--white);margin-bottom:.5rem}
 .feature-desc{font-size:12px;color:var(--dim);line-height:1.8}
+
+/* NEW FEATURES BADGE */
+.new-badge{display:inline-block;background:var(--green);color:var(--bg);font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px;margin-left:8px;letter-spacing:.05em;text-transform:uppercase;vertical-align:middle}
 
 /* INSTALL */
 .install-section{padding:5rem 2rem;max-width:800px;margin:0 auto}
@@ -101,6 +107,11 @@ td{padding:8px 12px;border:1px solid var(--border);color:var(--text)}
 td:first-child{color:var(--cyan);font-family:'JetBrains Mono',monospace;white-space:nowrap}
 tr:hover td{background:var(--bg2)}
 .ic{background:var(--bg3);border:1px solid var(--border);padding:1px 6px;border-radius:3px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);display:inline}
+
+/* VERSION HIGHLIGHT */
+.version-highlight{background:var(--bg3);border-left:3px solid var(--red);padding:1.5rem;margin:2rem 0;border-radius:0 6px 6px 0}
+.version-highlight p{margin-bottom:.5rem}
+.version-highlight .tag{color:var(--red);font-weight:700}
 
 /* FOOTER */
 footer{border-top:1px solid var(--border);padding:3rem 2rem;text-align:center}
@@ -157,7 +168,7 @@ footer{border-top:1px solid var(--border);padding:3rem 2rem;text-align:center}
 <span class="o">  ██╔═══╝ ██╔══╝  ██╔══██╗████╔╝██║</span>
 <span class="r">  ███████╗███████╗██║  ██║╚██████╔╝</span>
 <span class="d">  ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ </span></pre>
-    <p class="hero-tag">v1.0.3 · Arch Linux · MIT License</p>
+    <p class="hero-tag">v1.0.4 · Arch Linux · MIT License</p>
     <h1 class="hero-title" data-i="hero_title">Command alias manager<br>for <span class="accent">Arch Linux</span></h1>
     <p class="hero-sub" data-i="hero_sub">Type less. Do more. 80+ built-in shortcuts. Interactive REPL session.</p>
     <div class="badges">
@@ -194,15 +205,18 @@ footer{border-top:1px solid var(--border);padding:3rem 2rem;text-align:center}
       <div class="t-banner-o">  ██╔═══╝ ██╔══╝  ██╔══██╗████╔╝██║</div>
       <div class="t-banner-r">  ███████╗███████╗██║  ██║╚██████╔╝</div>
       <br>
-      <div><span class="t-out">  <span data-i="term_hello">Hello</span>, Corona. ZER0 v1.0.3 <span data-i="term_online">is online</span>.</span></div>
+      <div><span class="t-out">  <span data-i="term_hello">Hello</span>, Corona. ZER0 <span class="t-success">v1.0.4</span> <span data-i="term_online">is online</span>.</span></div>
       <div><span class="t-out">  <span data-i="term_devby">Developed by</span>: LogLabs · https://github.com/LogLabsHQ</span></div>
       <br>
       <div><span class="t-prompt">[corona@ZER0 ~]$</span> <span class="t-cmd">upd</span></div>
       <div><span class="t-comment">  → sudo pacman -Syu</span></div>
-      <div><span class="t-prompt">[corona@ZER0 ~]$</span> <span class="t-cmd">gs</span></div>
-      <div><span class="t-comment">  → git status</span></div>
-      <div><span class="t-prompt">[corona@ZER0 ~]$</span> <span class="t-cmd">add deploy "git push && ssh server ./deploy.sh"</span></div>
-      <div><span class="t-success">  ✔  <span data-i="term_saved">Shortcut saved</span>: deploy</span></div>
+      <div><span class="t-prompt">[corona@ZER0 ~]$</span> <span class="t-cmd">search docker</span></div>
+      <div><span class="t-search">  🔍 dcu → docker-compose up -d</span></div>
+      <div><span class="t-search">     dcd → docker-compose down</span></div>
+      <div><span class="t-prompt">[corona@ZER0 ~]$</span> <span class="t-cmd">explain upd</span></div>
+      <div><span class="t-learn">  📚 Actualiza el sistema (Sync + Upgrade)</span></div>
+      <div><span class="t-prompt">[corona@ZER0 ~]$</span> <span class="t-cmd">theme dark</span></div>
+      <div><span class="t-theme">  🎨 Tema cambiado a: dark</span></div>
       <br>
       <div><span class="t-prompt">[corona@ZER0 ~]$</span> <span class="cursor"></span></div>
     </div>
@@ -220,8 +234,22 @@ footer{border-top:1px solid var(--border);padding:3rem 2rem;text-align:center}
     <div class="feature-card"><div class="feature-icon">📦</div><div class="feature-title" data-i="f4_title">Single file install</div><p class="feature-desc" data-i="f4_desc">One <span class="ic">install.sh</span> does everything. No extra dependencies.</p></div>
     <div class="feature-card"><div class="feature-icon">🔒</div><div class="feature-title" data-i="f5_title">100% local</div><p class="feature-desc" data-i="f5_desc">No telemetry. No accounts. No network calls. Your data stays on your machine.</p></div>
     <div class="feature-card"><div class="feature-icon">🎨</div><div class="feature-title" data-i="f6_title">Colorful terminal UI</div><p class="feature-desc" data-i="f6_desc">Styled banner, colored prompt, box UI and LogLabs branding. Built for Arch terminals.</p></div>
+    <div class="feature-card"><div class="feature-icon">📚</div><div class="feature-title">Learn mode <span class="new-badge" data-i="new_badge">NEW</span></div><p class="feature-desc" data-i="f7_desc">Explains each command as you run it. Perfect for learning Arch. Activate with <span class="ic">--learn</span> or <span class="ic">learn</span>.</p></div>
+    <div class="feature-card"><div class="feature-icon">🔍</div><div class="feature-title">Search <span class="new-badge" data-i="new_badge">NEW</span></div><p class="feature-desc" data-i="f8_desc">Find shortcuts instantly with <span class="ic">search &lt;pattern&gt;</span>. Searches commands and descriptions.</p></div>
+    <div class="feature-card"><div class="feature-icon">💡</div><div class="feature-title">Explain <span class="new-badge" data-i="new_badge">NEW</span></div><p class="feature-desc" data-i="f9_desc">Learn what each shortcut does with <span class="ic">explain &lt;alias&gt;</span>. Includes educational descriptions.</p></div>
+    <div class="feature-card"><div class="feature-icon">📂</div><div class="feature-title">Categories <span class="new-badge" data-i="new_badge">NEW</span></div><p class="feature-desc" data-i="f10_desc">Load entire categories with <span class="ic">category load &lt;name&gt;</span>. Pacman, Git, Docker, Systemd and more.</p></div>
+    <div class="feature-card"><div class="feature-icon">💾</div><div class="feature-title">Export/Import <span class="new-badge" data-i="new_badge">NEW</span></div><p class="feature-desc" data-i="f11_desc">Backup your shortcuts with <span class="ic">export</span> and restore with <span class="ic">import</span>. JSON format.</p></div>
+    <div class="feature-card"><div class="feature-icon">🎭</div><div class="feature-title">Themes <span class="new-badge" data-i="new_badge">NEW</span></div><p class="feature-desc" data-i="f12_desc">4 visual themes: default, dark, light, hacker. Switch with <span class="ic">theme &lt;name&gt;</span>.</p></div>
   </div>
 </section>
+
+<!-- VERSION HIGHLIGHT -->
+<div class="install-section">
+  <div class="version-highlight">
+    <p><span class="tag">✨ ZER0 v1.0.4</span> <span data-i="version_tag">— Major update with 8 new features</span></p>
+    <p style="font-size:12px; color:var(--cyan)" data-i="version_desc">Learn mode, search, explain, categories, export/import, themes, history, autocomplete</p>
+  </div>
+</div>
 
 <!-- INSTALL -->
 <section class="install-section" id="install">
@@ -255,6 +283,7 @@ zero</pre>
       <div class="docs-nav-title" data-i="on_this_page">On this page</div>
       <ul>
         <li><a href="#doc-commands" data-i="dnav_commands">Internal Commands</a></li>
+        <li><a href="#doc-new" data-i="dnav_new">New in v1.0.4</a></li>
         <li><a href="#doc-shortcuts" data-i="dnav_shortcuts">Default Shortcuts</a></li>
         <li><a href="#doc-config" data-i="dnav_config">Configuration</a></li>
         <li><a href="#doc-update" data-i="dnav_update">Update</a></li>
@@ -272,12 +301,37 @@ zero</pre>
           <tr><td>add &lt;shortcut&gt; &lt;cmd&gt;</td><td>a</td><td data-i="cmd_add">Add or update a shortcut</td></tr>
           <tr><td>rm &lt;shortcut&gt;</td><td>remove, del</td><td data-i="cmd_rm">Delete a shortcut</td></tr>
           <tr><td>&lt;shortcut&gt; [args…]</td><td>—</td><td data-i="cmd_run">Run a shortcut</td></tr>
+          <tr><td>search &lt;pattern&gt;</td><td>—</td><td data-i="cmd_search">Search shortcuts by name or description <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
+          <tr><td>explain &lt;alias&gt;</td><td>—</td><td data-i="cmd_explain">Show detailed explanation of a shortcut <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
+          <tr><td>category</td><td>cat</td><td data-i="cmd_category">List all categories <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
+          <tr><td>category load &lt;name&gt;</td><td>—</td><td data-i="cmd_category_load">Load all shortcuts from a category <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
+          <tr><td>export [filename]</td><td>—</td><td data-i="cmd_export">Export shortcuts to JSON <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
+          <tr><td>import &lt;filename&gt;</td><td>—</td><td data-i="cmd_import">Import shortcuts from JSON <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
+          <tr><td>theme</td><td>—</td><td data-i="cmd_theme">Show current theme <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
+          <tr><td>theme &lt;name&gt;</td><td>—</td><td data-i="cmd_theme_set">Change theme (default/dark/light/hacker) <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
+          <tr><td>learn</td><td>—</td><td data-i="cmd_learn">Toggle learn mode on/off <span class="new-badge" data-i="new_badge">NEW</span></td></tr>
           <tr><td>clear</td><td>cls, c</td><td data-i="cmd_clear">Clear screen and show banner</td></tr>
           <tr><td>about</td><td>—</td><td data-i="cmd_about">Show info about ZER0</td></tr>
           <tr><td>lang</td><td>—</td><td data-i="cmd_lang">Change language</td></tr>
           <tr><td>help</td><td>--help, -h</td><td data-i="cmd_help">Show command list</td></tr>
           <tr><td>version</td><td>-v</td><td data-i="cmd_version">Show current version</td></tr>
           <tr><td>exit</td><td>quit, q, Ctrl+C</td><td data-i="cmd_exit">Exit ZER0</td></tr>
+        </table>
+      </section>
+
+      <section id="doc-new">
+        <h2>✨ <span data-i="doc_new_title">What's New in v1.0.4</span></h2>
+        <p data-i="doc_new_desc">This major release adds 8 powerful new features while keeping ZER0 simple and local:</p>
+        <table>
+          <tr><th data-i="th_feature">Feature</th><th data-i="th_desc">Description</th></tr>
+          <tr><td>📚 Learn mode</td><td data-i="new1">Explains each command as you run it. Perfect for learning Arch.</td></tr>
+          <tr><td>🔍 Search</td><td data-i="new2">Find shortcuts instantly with <span class="ic">search &lt;pattern&gt;</span>.</td></tr>
+          <tr><td>💡 Explain</td><td data-i="new3">Learn what each shortcut does with <span class="ic">explain &lt;alias&gt;</span>.</td></tr>
+          <tr><td>📂 Categories</td><td data-i="new4">Load entire categories with <span class="ic">category load &lt;name&gt;</span>.</td></tr>
+          <tr><td>💾 Export/Import</td><td data-i="new5">Backup and restore your shortcuts with JSON files.</td></tr>
+          <tr><td>🎭 Themes</td><td data-i="new6">4 visual themes: default, dark, light, hacker.</td></tr>
+          <tr><td>📜 History</td><td data-i="new7">Navigate previous commands with arrow keys.</td></tr>
+          <tr><td>⭾ Autocomplete</td><td data-i="new8">Press TAB to autocomplete commands and shortcuts.</td></tr>
         </table>
       </section>
 
@@ -333,13 +387,16 @@ zero</pre>
           <pre>{
   "name": "YourName",
   "lang": "en",
+  "learn_mode": false,
+  "theme": "default",
+  "version": "1.0.4",
   "aliases": {
     "upd": "sudo pacman -Syu",
     "gs":  "git status"
   }
 }</pre>
         </div>
-        <p data-i="doc_config_note"><span class="ic">lang</span> accepts <span class="ic">"en"</span> or <span class="ic">"es"</span>.</p>
+        <p data-i="doc_config_note"><span class="ic">lang</span> accepts <span class="ic">"en"</span> or <span class="ic">"es"</span>. <span class="ic">theme</span> can be <span class="ic">"default"</span>, <span class="ic">"dark"</span>, <span class="ic">"light"</span>, or <span class="ic">"hacker"</span>.</p>
       </section>
 
       <section id="doc-update">
@@ -386,7 +443,7 @@ rm -rf ~/ZER0</pre>
     <a href="https://github.com/LogLabsHQ/ZER0/blob/main/LICENSE" target="_blank">MIT License</a>
     <a href="https://github.com/LogLabsHQ" target="_blank">LogLabs</a>
   </div>
-  <p class="footer-copy">© 2026 LogLabs · MIT License</p>
+  <p class="footer-copy">© 2026 LogLabs · MIT License · v1.0.4</p>
 </footer>
 
 <div class="toast" id="toast"></div>
@@ -417,30 +474,64 @@ const T = {
     f5_desc:"No telemetry. No accounts. No network calls. Your data stays on your machine.",
     f6_title:"Colorful terminal UI",
     f6_desc:"Styled banner, colored prompt, box UI and LogLabs branding. Built for Arch terminals.",
+    f7_title:"Learn mode",
+    f7_desc:"Explains each command as you run it. Perfect for learning Arch. Activate with <span class='ic'>--learn</span> or <span class='ic'>learn</span>.",
+    f8_title:"Search",
+    f8_desc:"Find shortcuts instantly with <span class='ic'>search &lt;pattern&gt;</span>. Searches commands and descriptions.",
+    f9_title:"Explain",
+    f9_desc:"Learn what each shortcut does with <span class='ic'>explain &lt;alias&gt;</span>. Includes educational descriptions.",
+    f10_title:"Categories",
+    f10_desc:"Load entire categories with <span class='ic'>category load &lt;name&gt;</span>. Pacman, Git, Docker, Systemd and more.",
+    f11_title:"Export/Import",
+    f11_desc:"Backup your shortcuts with <span class='ic'>export</span> and restore with <span class='ic'>import</span>. JSON format.",
+    f12_title:"Themes",
+    f12_desc:"4 visual themes: default, dark, light, hacker. Switch with <span class='ic'>theme &lt;name&gt;</span>.",
+    new_badge:"NEW",
+    version_tag:"— Major update with 8 new features",
+    version_desc:"Learn mode, search, explain, categories, export/import, themes, history, autocomplete",
     install_title:"Up and running<br>in 60 seconds",
     step_clone:"Clone", step_install:"Install", step_open:"Reload and open",
     install_note:"After install, ZER0 also responds to <span class='ic'>-Z</span> and <span class='ic'>$Z</span>.",
     copy_btn:"copy",
     docs_title:"Reference",
     on_this_page:"On this page",
-    dnav_commands:"Internal Commands", dnav_shortcuts:"Default Shortcuts",
+    dnav_commands:"Internal Commands", dnav_new:"New in v1.0.4", dnav_shortcuts:"Default Shortcuts",
     dnav_config:"Configuration", dnav_update:"Update", dnav_uninstall:"Uninstall",
     doc_commands_title:"Internal Commands",
     doc_commands_desc:"All commands available inside the ZER0 session. No prefix needed.",
     th_command:"Command", th_aliases:"Aliases", th_desc:"Description",
-    th_shortcut:"Shortcut",
+    th_shortcut:"Shortcut", th_feature:"Feature",
     cmd_list:"List all saved shortcuts", cmd_add:"Add or update a shortcut",
     cmd_rm:"Delete a shortcut", cmd_run:"Run a shortcut",
+    cmd_search:"Search shortcuts by name or description",
+    cmd_explain:"Show detailed explanation of a shortcut",
+    cmd_category:"List all categories",
+    cmd_category_load:"Load all shortcuts from a category",
+    cmd_export:"Export shortcuts to JSON",
+    cmd_import:"Import shortcuts from JSON",
+    cmd_theme:"Show current theme",
+    cmd_theme_set:"Change theme (default/dark/light/hacker)",
+    cmd_learn:"Toggle learn mode on/off",
     cmd_clear:"Clear screen and show banner", cmd_about:"Show info about ZER0",
     cmd_lang:"Change language", cmd_help:"Show command list",
     cmd_version:"Show current version", cmd_exit:"Exit ZER0",
+    doc_new_title:"What's New in v1.0.4",
+    doc_new_desc:"This major release adds 8 powerful new features while keeping ZER0 simple and local:",
+    new1:"Explains each command as you run it. Perfect for learning Arch.",
+    new2:"Find shortcuts instantly with <span class='ic'>search &lt;pattern&gt;</span>.",
+    new3:"Learn what each shortcut does with <span class='ic'>explain &lt;alias&gt;</span>.",
+    new4:"Load entire categories with <span class='ic'>category load &lt;name&gt;</span>.",
+    new5:"Backup and restore your shortcuts with JSON files.",
+    new6:"4 visual themes: default, dark, light, hacker.",
+    new7:"Navigate previous commands with arrow keys.",
+    new8:"Press TAB to autocomplete commands and shortcuts.",
     doc_shortcuts_title:"Default Shortcuts",
     doc_shortcuts_desc:"80+ shortcuts loaded on first launch. Type <span class='ic'>list</span> inside ZER0 to see all of them.",
     cat_pkg:"Package Management",
     wiki_link:"See all 80+ shortcuts in the Wiki ↗",
     doc_config_title:"Configuration",
     doc_config_desc:"ZER0 stores everything in <span class='ic'>~/.config/zer0/config.json</span>. You can edit it manually.",
-    doc_config_note:"<span class='ic'>lang</span> accepts <span class='ic'>\"en\"</span> or <span class='ic'>\"es\"</span>.",
+    doc_config_note:"<span class='ic'>lang</span> accepts <span class='ic'>\"en\"</span> or <span class='ic'>\"es\"</span>. <span class='ic'>theme</span> can be <span class='ic'>\"default\"</span>, <span class='ic'>\"dark\"</span>, <span class='ic'>\"light\"</span>, or <span class='ic'>\"hacker\"</span>.",
     doc_update_title:"Update",
     doc_update_desc:"When a new version is released:",
     doc_update_note:"Your shortcuts, name and language are never touched by the installer.",
@@ -473,30 +564,64 @@ const T = {
     f5_desc:"Sin telemetría. Sin cuentas. Sin llamadas de red. Tus datos se quedan en tu máquina.",
     f6_title:"Interfaz de terminal colorida",
     f6_desc:"Banner estilizado, prompt de colores, UI en cajas y branding de LogLabs. Hecho para Arch.",
+    f7_title:"Modo aprendiz",
+    f7_desc:"Explica cada comando mientras lo ejecutas. Perfecto para aprender Arch. Activa con <span class='ic'>--learn</span> o <span class='ic'>learn</span>.",
+    f8_title:"Búsqueda",
+    f8_desc:"Encuentra atajos al instante con <span class='ic'>search &lt;patrón&gt;</span>. Busca comandos y descripciones.",
+    f9_title:"Explicación",
+    f9_desc:"Aprende qué hace cada atajo con <span class='ic'>explain &lt;alias&gt;</span>. Incluye descripciones educativas.",
+    f10_title:"Categorías",
+    f10_desc:"Carga categorías completas con <span class='ic'>category load &lt;nombre&gt;</span>. Pacman, Git, Docker, Systemd y más.",
+    f11_title:"Exportar/Importar",
+    f11_desc:"Respaldar tus atajos con <span class='ic'>export</span> y restaurar con <span class='ic'>import</span>. Formato JSON.",
+    f12_title:"Temas",
+    f12_desc:"4 temas visuales: default, dark, light, hacker. Cambia con <span class='ic'>theme &lt;nombre&gt;</span>.",
+    new_badge:"NUEVO",
+    version_tag:"— Actualización mayor con 8 nuevas funciones",
+    version_desc:"Modo aprendiz, búsqueda, explicación, categorías, exportar/importar, temas, historial, autocompletado",
     install_title:"Listo en<br>60 segundos",
     step_clone:"Clonar", step_install:"Instalar", step_open:"Recargar y abrir",
     install_note:"Tras instalar, ZER0 también responde a <span class='ic'>-Z</span> y <span class='ic'>$Z</span>.",
     copy_btn:"copiar",
     docs_title:"Referencia",
     on_this_page:"En esta página",
-    dnav_commands:"Comandos internos", dnav_shortcuts:"Atajos por defecto",
+    dnav_commands:"Comandos internos", dnav_new:"Nuevo en v1.0.4", dnav_shortcuts:"Atajos por defecto",
     dnav_config:"Configuración", dnav_update:"Actualizar", dnav_uninstall:"Desinstalar",
     doc_commands_title:"Comandos internos",
     doc_commands_desc:"Todos los comandos disponibles dentro de la sesión de ZER0. Sin prefijo.",
     th_command:"Comando", th_aliases:"Aliases", th_desc:"Descripción",
-    th_shortcut:"Atajo",
+    th_shortcut:"Atajo", th_feature:"Función",
     cmd_list:"Listar todos los atajos", cmd_add:"Agregar o actualizar un atajo",
     cmd_rm:"Eliminar un atajo", cmd_run:"Ejecutar un atajo",
+    cmd_search:"Buscar atajos por nombre o descripción",
+    cmd_explain:"Mostrar explicación detallada de un atajo",
+    cmd_category:"Listar todas las categorías",
+    cmd_category_load:"Cargar todos los atajos de una categoría",
+    cmd_export:"Exportar atajos a JSON",
+    cmd_import:"Importar atajos desde JSON",
+    cmd_theme:"Mostrar tema actual",
+    cmd_theme_set:"Cambiar tema (default/dark/light/hacker)",
+    cmd_learn:"Activar/desactivar modo aprendiz",
     cmd_clear:"Limpiar pantalla y mostrar banner", cmd_about:"Mostrar info sobre ZER0",
     cmd_lang:"Cambiar idioma", cmd_help:"Mostrar lista de comandos",
     cmd_version:"Mostrar versión actual", cmd_exit:"Salir de ZER0",
+    doc_new_title:"Novedades en v1.0.4",
+    doc_new_desc:"Esta versión mayor añade 8 nuevas funciones manteniendo ZER0 simple y local:",
+    new1:"Explica cada comando mientras lo ejecutas. Perfecto para aprender Arch.",
+    new2:"Encuentra atajos al instante con <span class='ic'>search &lt;patrón&gt;</span>.",
+    new3:"Aprende qué hace cada atajo con <span class='ic'>explain &lt;alias&gt;</span>.",
+    new4:"Carga categorías completas con <span class='ic'>category load &lt;nombre&gt;</span>.",
+    new5:"Respaldar y restaurar tus atajos con archivos JSON.",
+    new6:"4 temas visuales: default, dark, light, hacker.",
+    new7:"Navega comandos anteriores con flechas del teclado.",
+    new8:"Presiona TAB para autocompletar comandos y atajos.",
     doc_shortcuts_title:"Atajos por defecto",
     doc_shortcuts_desc:"+80 atajos cargados en el primer inicio. Escribe <span class='ic'>list</span> dentro de ZER0 para verlos.",
     cat_pkg:"Gestión de paquetes",
     wiki_link:"Ver los +80 atajos en la Wiki ↗",
     doc_config_title:"Configuración",
     doc_config_desc:"ZER0 guarda todo en <span class='ic'>~/.config/zer0/config.json</span>. Puedes editarlo manualmente.",
-    doc_config_note:"<span class='ic'>lang</span> acepta <span class='ic'>\"en\"</span> o <span class='ic'>\"es\"</span>.",
+    doc_config_note:"<span class='ic'>lang</span> acepta <span class='ic'>\"en\"</span> o <span class='ic'>\"es\"</span>. <span class='ic'>theme</span> puede ser <span class='ic'>\"default\"</span>, <span class='ic'>\"dark\"</span>, <span class='ic'>\"light\"</span> o <span class='ic'>\"hacker\"</span>.",
     doc_update_title:"Actualizar",
     doc_update_desc:"Cuando salga una nueva versión:",
     doc_update_note:"Tus atajos, nombre e idioma nunca son tocados por el instalador.",
@@ -514,26 +639,21 @@ function setLang(lang) {
   currentLang = lang;
   localStorage.setItem('zer0_lang', lang);
 
-  // Update all data-i elements
   document.querySelectorAll('[data-i]').forEach(el => {
     const key = el.getAttribute('data-i');
     if (T[lang][key] !== undefined) el.innerHTML = T[lang][key];
   });
 
-  // Update html lang attr
   document.documentElement.lang = lang;
 
-  // Update title
   document.title = lang === 'es'
     ? 'ZER0 — Gestor de alias para Arch Linux'
     : 'ZER0 — Command alias manager for Arch Linux';
 
-  // Update lang buttons
   document.querySelectorAll('.lang-btn').forEach(btn => {
     btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
   });
 
-  // Toast
   showToast(T[lang].toast_lang);
 }
 
@@ -558,7 +678,6 @@ function copyCode(btn, id) {
   });
 }
 
-// Active docs nav
 const sections = document.querySelectorAll('.docs-content section');
 sections.forEach(s => {
   new IntersectionObserver((entries) => {
@@ -572,7 +691,6 @@ sections.forEach(s => {
   }, { threshold: 0.3, rootMargin: '-60px 0px 0px 0px' }).observe(s);
 });
 
-// Init with saved lang
 setLang(currentLang);
 </script>
 </body>
