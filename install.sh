@@ -18,7 +18,7 @@ RST="\033[0m"
 
 INSTALL_DIR="$HOME/.local/bin"
 
-# ── Banner ────────────────────────────────────────────────────────────────────
+# ── Banner ───────────────────────────────────────────────────────────────────
 clear
 echo ""
 echo -e "${R}  ██████╗ ███████╗██████╗  ██████╗ ${RST}"
@@ -29,7 +29,7 @@ echo -e "${R}  ███████╗███████╗██║  ██
 echo -e "${DIM}  ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ${RST}"
 echo ""
 
-# ── Selector de idioma con flechas ────────────────────────────────────────────
+# ── Selector de idioma con flechas ───────────────────────────────────────────
 OPCIONES=("Español" "English")
 SELECTED=0
 
@@ -47,10 +47,8 @@ draw_menu() {
 
 echo -e "  ${W}${B}Elige tu idioma / Choose your language:${RST}"
 echo ""
+tput civis 2>/dev/null || true
 
-tput civis 2>/dev/null || true   # ocultar cursor
-
-# Dibujar menú inicial
 for i in "${!OPCIONES[@]}"; do
     if [[ $i -eq $SELECTED ]]; then
         echo -e "  ${C}▶ ${W}${B}${OPCIONES[$i]}${RST}"
@@ -74,9 +72,8 @@ while true; do
     fi
 done
 
-# Bajar cursor al final del menú
 tput cud ${#OPCIONES[@]} 2>/dev/null || echo -e "\n"
-tput cnorm 2>/dev/null || true   # restaurar cursor
+tput cnorm 2>/dev/null || true
 echo ""
 
 if [[ $SELECTED -eq 0 ]]; then
@@ -88,7 +85,7 @@ else
 fi
 echo ""
 
-# ── Mensajes según idioma ─────────────────────────────────────────────────────
+# ── Mensajes según idioma ────────────────────────────────────────────────────
 if [[ "$LANG_CODE" == "es" ]]; then
     MSG_INSTALLING="Instalando ZER0 en tu sistema..."
     MSG_NO_PYTHON="Python 3 no encontrado. Instálalo con: sudo pacman -S python"
@@ -126,7 +123,7 @@ echo -e "${C}  │${RST}  ${B}${MSG_INSTALLING}${RST}   ${C}│${RST}"
 echo -e "${C}  ╰──────────────────────────────────────╯${RST}"
 echo ""
 
-# ── Verificar Python 3.10+ ────────────────────────────────────────────────────
+# ── Verificar Python 3.10+ ───────────────────────────────────────────────────
 if ! command -v python3 &>/dev/null; then
     echo -e "  ${R}✘${RST}  ${MSG_NO_PYTHON}\n"
     exit 1
@@ -142,42 +139,29 @@ if [[ "$PY_MAJOR" -lt 3 || ( "$PY_MAJOR" -eq 3 && "$PY_MINOR" -lt 10 ) ]]; then
 fi
 echo -e "  ${G}✔${RST}  ${MSG_PY_OK}: ${W}$PY_VER${RST}"
 
-# ── Crear directorio ───────────────────────────────────────────────────────────
 mkdir -p "$INSTALL_DIR"
 echo -e "  ${G}✔${RST}  ${MSG_DIR} ${DIM}$INSTALL_DIR${RST}"
 
-# ── Escribir zer0.py embebido ─────────────────────────────────────────────────
-cat > "$INSTALL_DIR/zero" << PYEOF
+# ── Python embebido ──────────────────────────────────────────────────────────
+cat > "$INSTALL_DIR/zero" << 'PYEOF'
 #!/usr/bin/env python3
-"""
-ZER0 — Command alias manager for Arch Linux
-Desarrollado por LogLabs — https://github.com/LogLabsGit
-"""
+"""ZER0 v1.0.3 — LogLabs"""
 
-import os
-import sys
-import json
-import re
-import subprocess
+import os, sys, json, re, subprocess, tty, termios
 from pathlib import Path
 
 CONFIG_DIR  = Path.home() / ".config" / "zer0"
 CONFIG_FILE = CONFIG_DIR / "config.json"
 
-R   = "\033[38;5;196m"
-O   = "\033[38;5;208m"
-Y   = "\033[38;5;226m"
-C   = "\033[38;5;51m"
-W   = "\033[97m"
-G   = "\033[38;5;46m"
-DIM = "\033[2m"
-B   = "\033[1m"
-RST = "\033[0m"
+R   = "\033[38;5;196m"; O   = "\033[38;5;208m"; Y = "\033[38;5;226m"
+C   = "\033[38;5;51m";  W   = "\033[97m";        G = "\033[38;5;46m"
+DIM = "\033[2m";         B   = "\033[1m";         RST = "\033[0m"
 
-VERSION = "1.0.0"
+VERSION = "1.0.3"
 AUTHOR  = "LogLabs"
 GITHUB  = "https://github.com/LogLabsGit"
 REPO    = "https://github.com/LogLabsGit/ZER0"
+MIT     = "MIT License — Copyright (c) 2026 LogLabs"
 
 BANNER = f"""
 {R}  ██████╗ ███████╗██████╗  ██████╗ {RST}
@@ -189,39 +173,184 @@ BANNER = f"""
 
 _ANSI = re.compile(r"\033\[[0-9;]*m")
 
-# ── Textos por idioma ─────────────────────────────────────────────────────────
+# ── Atajos por defecto ────────────────────────────────────────────────────────
+DEFAULT_ALIASES = {
+    # Sistema
+    "upd":      "sudo pacman -Syu",
+    "updf":     "sudo pacman -Syyu",
+    "ins":      "sudo pacman -S",
+    "rem":      "sudo pacman -Rns",
+    "search":   "pacman -Ss",
+    "info":     "pacman -Si",
+    "orphans":  "sudo pacman -Rns $(pacman -Qdtq)",
+    "mirrors":  "sudo reflector --latest 20 --sort rate --save /etc/pacman.d/mirrorlist",
+    "pkgs":     "pacman -Qq | wc -l",
+    "cache":    "sudo pacman -Scc",
+    "unlock":   "sudo rm /var/lib/pacman/db.lck",
+    # AUR (yay)
+    "yayu":     "yay -Syu",
+    "yays":     "yay -S",
+    "yayr":     "yay -Rns",
+    # Systemd
+    "sstart":   "sudo systemctl start",
+    "sstop":    "sudo systemctl stop",
+    "srestart": "sudo systemctl restart",
+    "sstatus":  "sudo systemctl status",
+    "senable":  "sudo systemctl enable",
+    "sdisable": "sudo systemctl disable",
+    "slist":    "systemctl list-units --type=service --state=running",
+    "jlog":     "journalctl -xe",
+    "jboot":    "journalctl -b",
+    # Red
+    "myip":     "curl -s ifconfig.me",
+    "localip":  "ip addr show | grep 'inet ' | awk '{print $2}'",
+    "ports":    "ss -tulpn",
+    "ping8":    "ping -c 4 8.8.8.8",
+    "netstat":  "ss -tulpn",
+    "wifis":    "nmcli dev wifi list",
+    "wificon":  "nmcli dev wifi connect",
+    # Archivos y directorios
+    "ll":       "ls -lah --color=auto",
+    "la":       "ls -A --color=auto",
+    "lt":       "ls -lAht --color=auto",
+    "mkd":      "mkdir -p",
+    "rmf":      "rm -rf",
+    "cpv":      "cp -v",
+    "mvv":      "mv -v",
+    "duh":      "du -sh *",
+    "dfh":      "df -h",
+    "fhere":    "find . -name",
+    "extract":  "tar -xvf",
+    "targz":    "tar -czvf",
+    "zip":      "zip -r",
+    "unzip":    "unzip",
+    # Procesos
+    "psg":      "ps aux | grep",
+    "mem":      "free -h",
+    "cpu":      "lscpu",
+    "top":      "htop",
+    "killp":    "kill -9",
+    "killn":    "killall",
+    # Git
+    "gs":       "git status",
+    "ga":       "git add .",
+    "gc":       "git commit -m",
+    "gp":       "git push",
+    "gpl":      "git pull",
+    "gco":      "git checkout",
+    "gb":       "git branch",
+    "gba":      "git branch -a",
+    "glog":     "git log --oneline --graph --decorate",
+    "gdiff":    "git diff",
+    "gstash":   "git stash",
+    "gpop":     "git stash pop",
+    "greset":   "git reset --hard HEAD",
+    "gclean":   "git clean -fd",
+    "gclone":   "git clone",
+    "ginit":    "git init",
+    "gtag":     "git tag",
+    "gfetch":   "git fetch",
+    # Python
+    "py":       "python3",
+    "pip":      "pip3",
+    "pipi":     "pip3 install",
+    "pipu":     "pip3 install --upgrade",
+    "venv":     "python3 -m venv venv",
+    "activate": "source venv/bin/activate",
+    "deact":    "deactivate",
+    "pyserv":   "python3 -m http.server 8080",
+    # Node / npm
+    "ni":       "npm install",
+    "nr":       "npm run",
+    "nb":       "npm run build",
+    "nd":       "npm run dev",
+    "nst":      "npm start",
+    "ntest":    "npm test",
+    "nci":      "npm ci",
+    "nlg":      "npm list -g --depth=0",
+    # Docker
+    "dps":      "docker ps",
+    "dpsa":     "docker ps -a",
+    "di":       "docker images",
+    "drm":      "docker rm",
+    "drmi":     "docker rmi",
+    "dstop":    "docker stop",
+    "dstart":   "docker start",
+    "dlogs":    "docker logs -f",
+    "dexec":    "docker exec -it",
+    "dprune":   "docker system prune -af",
+    "dcu":      "docker-compose up -d",
+    "dcd":      "docker-compose down",
+    "dcr":      "docker-compose restart",
+    # Editores
+    "v":        "nvim",
+    "vi":       "nvim",
+    "nano":     "nano",
+    "code":     "code .",
+    # Navegación rápida
+    "..":       "cd ..",
+    "...":      "cd ../..",
+    "....":     "cd ../../..",
+    "home":     "cd ~",
+    "cfg":      "cd ~/.config",
+    "zcfg":     "cd ~/.config/zer0",
+    # Misc útil
+    "cls":      "clear",
+    "rld":      "source ~/.bashrc",
+    "path":     "echo $PATH | tr ':' '\n'",
+    "hist":     "history | tail -30",
+    "now":      "date '+%Y-%m-%d %H:%M:%S'",
+    "week":     "date +%V",
+    "pubkey":   "cat ~/.ssh/id_rsa.pub",
+    "genkey":   "ssh-keygen -t ed25519 -C",
+    "weather":  "curl wttr.in",
+    "cheat":    "curl cheat.sh/",
+    "speedtest":"curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -",
+}
+
+# ── i18n ─────────────────────────────────────────────────────────────────────
 STRINGS = {
     "es": {
-        "welcome_hello":    "  Hola, {name}.             ",
-        "welcome_online":   "  ZER0 v{v} está en línea.       ",
-        "first_title":      "  Primera vez aquí. ¡Bienvenido!  ",
-        "first_sub":        "  ZER0 v{v} — Arch Linux         ",
-        "ask_name":         "¿Cómo te llamas?",
-        "default_name":     "Usuario",
-        "ready":            "  Listo, {name}. ZER0 ya es tuyo.  ",
-        "tip":              "Tip: escribe  {help}  para ver los comandos.",
-        "dev":              "Desarrollado por:",
-        "hint_help":        "Escribe  {help}  para ver los comandos.  {exit}  para salir.",
-        "no_aliases":       "No hay atajos guardados todavía.",
-        "no_aliases_tip":   "Agrega uno con:  {add}",
-        "aliases_title":    "Atajos guardados:",
-        "alias_saved":      "Atajo guardado:    {a}  →  {c}",
-        "alias_updated":    "Atajo actualizado: {a}  →  {c}",
-        "alias_deleted":    "Atajo eliminado:   {a}",
-        "alias_not_found":  "El atajo '{a}' no existe.",
-        "cmd_not_found":    "Comando o atajo '{a}' no encontrado.",
-        "cmd_not_found_tip":"Escribe  {list}  para ver los atajos disponibles.",
-        "usage_add":        "Uso:  add <atajo> <comando completo>",
-        "usage_rm":         "Uso:  rm <atajo>",
-        "goodbye":          "Hasta luego, {name}. 👋",
-        "lang_changed":     "Idioma cambiado a Español.",
-        "lang_select":      "Elige tu idioma / Choose your language:",
-        "help_title":       "Comandos disponibles:",
+        "welcome_hello":     "  Hola, {name}.             ",
+        "welcome_online":    "  ZER0 v{v} está en línea.       ",
+        "first_title":       "  Primera vez aquí. ¡Bienvenido!  ",
+        "first_sub":         "  ZER0 v{v} — Arch Linux         ",
+        "ask_name":          "¿Cómo te llamas?",
+        "default_name":      "Usuario",
+        "ready":             "  Listo, {name}. ZER0 ya es tuyo.  ",
+        "tip":               "Tip: escribe  {help}  para ver los comandos.",
+        "dev":               "Desarrollado por:",
+        "hint_help":         "Escribe  {help}  para ver los comandos.  {exit}  para salir.",
+        "no_aliases":        "No hay atajos guardados todavía.",
+        "no_aliases_tip":    "Agrega uno con:  {add}",
+        "aliases_title":     "Atajos guardados:",
+        "alias_saved":       "Atajo guardado:    {a}  →  {c}",
+        "alias_updated":     "Atajo actualizado: {a}  →  {c}",
+        "alias_deleted":     "Atajo eliminado:   {a}",
+        "alias_not_found":   "El atajo '{a}' no existe.",
+        "cmd_not_found":     "Comando o atajo '{a}' no encontrado.",
+        "cmd_not_found_tip": "Escribe  {list}  para ver los atajos disponibles.",
+        "usage_add":         "Uso:  add <atajo> <comando completo>",
+        "usage_rm":          "Uso:  rm <atajo>",
+        "goodbye":           "Hasta luego, {name}. 👋",
+        "lang_changed":      "Idioma cambiado a Español. ✔",
+        "lang_select":       "Elige tu idioma / Choose your language:",
+        "help_title":        "Comandos disponibles:",
+        "about_title":       "Acerca de ZER0",
+        "about_license":     "Licencia:",
+        "about_dev":         "Desarrollado por:",
+        "about_github":      "GitHub:",
+        "about_repo":        "Repositorio:",
+        "about_version":     "Versión:",
+        "defaults_loaded":   "Atajos por defecto cargados.",
+        "defaults_skip":     "ya existe, se omitió.",
         "help_cmds": [
             ("list",               "Listar todos los atajos"),
             ("add <atajo> <cmd>",  "Agregar o actualizar un atajo"),
             ("rm  <atajo>",        "Eliminar un atajo"),
             ("<atajo> [args…]",    "Ejecutar un atajo"),
+            ("clear",              "Limpiar pantalla"),
+            ("about",              "Acerca de ZER0"),
             ("lang",               "Cambiar idioma"),
             ("help",               "Mostrar esta ayuda"),
             ("version",            "Mostrar versión"),
@@ -229,61 +358,68 @@ STRINGS = {
         ],
     },
     "en": {
-        "welcome_hello":    "  Hello, {name}.             ",
-        "welcome_online":   "  ZER0 v{v} is online.           ",
-        "first_title":      "  First time here. Welcome!       ",
-        "first_sub":        "  ZER0 v{v} — Arch Linux         ",
-        "ask_name":         "What's your name?",
-        "default_name":     "User",
-        "ready":            "  Done, {name}. ZER0 is yours.    ",
-        "tip":              "Tip: type  {help}  to see all commands.",
-        "dev":              "Developed by:",
-        "hint_help":        "Type  {help}  to see commands.  {exit}  to quit.",
-        "no_aliases":       "No shortcuts saved yet.",
-        "no_aliases_tip":   "Add one with:  {add}",
-        "aliases_title":    "Saved shortcuts:",
-        "alias_saved":      "Shortcut saved:    {a}  →  {c}",
-        "alias_updated":    "Shortcut updated:  {a}  →  {c}",
-        "alias_deleted":    "Shortcut removed:  {a}",
-        "alias_not_found":  "Shortcut '{a}' does not exist.",
-        "cmd_not_found":    "Command or shortcut '{a}' not found.",
-        "cmd_not_found_tip":"Type  {list}  to see available shortcuts.",
-        "usage_add":        "Usage:  add <shortcut> <full command>",
-        "usage_rm":         "Usage:  rm <shortcut>",
-        "goodbye":          "See you, {name}. 👋",
-        "lang_changed":     "Language changed to English.",
-        "lang_select":      "Elige tu idioma / Choose your language:",
-        "help_title":       "Available commands:",
+        "welcome_hello":     "  Hello, {name}.             ",
+        "welcome_online":    "  ZER0 v{v} is online.           ",
+        "first_title":       "  First time here. Welcome!       ",
+        "first_sub":         "  ZER0 v{v} — Arch Linux         ",
+        "ask_name":          "What's your name?",
+        "default_name":      "User",
+        "ready":             "  Done, {name}. ZER0 is yours.    ",
+        "tip":               "Tip: type  {help}  to see all commands.",
+        "dev":               "Developed by:",
+        "hint_help":         "Type  {help}  to see commands.  {exit}  to quit.",
+        "no_aliases":        "No shortcuts saved yet.",
+        "no_aliases_tip":    "Add one with:  {add}",
+        "aliases_title":     "Saved shortcuts:",
+        "alias_saved":       "Shortcut saved:    {a}  →  {c}",
+        "alias_updated":     "Shortcut updated:  {a}  →  {c}",
+        "alias_deleted":     "Shortcut removed:  {a}",
+        "alias_not_found":   "Shortcut '{a}' does not exist.",
+        "cmd_not_found":     "Command or shortcut '{a}' not found.",
+        "cmd_not_found_tip": "Type  {list}  to see available shortcuts.",
+        "usage_add":         "Usage:  add <shortcut> <full command>",
+        "usage_rm":          "Usage:  rm <shortcut>",
+        "goodbye":           "See you, {name}. 👋",
+        "lang_changed":      "Language changed to English. ✔",
+        "lang_select":       "Elige tu idioma / Choose your language:",
+        "help_title":        "Available commands:",
+        "about_title":       "About ZER0",
+        "about_license":     "License:",
+        "about_dev":         "Developed by:",
+        "about_github":      "GitHub:",
+        "about_repo":        "Repository:",
+        "about_version":     "Version:",
+        "defaults_loaded":   "Default shortcuts loaded.",
+        "defaults_skip":     "already exists, skipped.",
         "help_cmds": [
-            ("list",               "List all shortcuts"),
+            ("list",                "List all shortcuts"),
             ("add <shortcut> <cmd>","Add or update a shortcut"),
-            ("rm  <shortcut>",     "Delete a shortcut"),
-            ("<shortcut> [args…]", "Run a shortcut"),
-            ("lang",               "Change language"),
-            ("help",               "Show this help"),
-            ("version",            "Show version"),
-            ("exit / quit",        "Exit ZER0"),
+            ("rm  <shortcut>",      "Delete a shortcut"),
+            ("<shortcut> [args…]",  "Run a shortcut"),
+            ("clear",               "Clear screen"),
+            ("about",               "About ZER0"),
+            ("lang",                "Change language"),
+            ("help",                "Show this help"),
+            ("version",             "Show version"),
+            ("exit / quit",         "Exit ZER0"),
         ],
     },
 }
 
-def t(config: dict, key: str, **kwargs) -> str:
+def t(config: dict, key: str, **kw) -> str:
     lang = config.get("lang", "es")
     s = STRINGS.get(lang, STRINGS["es"]).get(key, key)
-    if kwargs:
-        s = s.format(**kwargs)
-    return s
+    return s.format(**kw) if kw else s
 
 # ── Config ────────────────────────────────────────────────────────────────────
-
 def load_config() -> dict:
     if not CONFIG_FILE.exists():
         return {"name": None, "lang": "es", "aliases": {}}
     try:
         with open(CONFIG_FILE) as f:
             cfg = json.load(f)
-            if "lang" not in cfg:
-                cfg["lang"] = "es"
+            cfg.setdefault("lang", "es")
+            cfg.setdefault("aliases", {})
             return cfg
     except (json.JSONDecodeError, OSError):
         return {"name": None, "lang": "es", "aliases": {}}
@@ -293,8 +429,16 @@ def save_config(config: dict) -> None:
     with open(CONFIG_FILE, "w") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
 
-# ── UI Helpers ────────────────────────────────────────────────────────────────
+def load_defaults(config: dict) -> None:
+    skipped = []
+    for alias, cmd in DEFAULT_ALIASES.items():
+        if alias not in config["aliases"]:
+            config["aliases"][alias] = cmd
+        else:
+            skipped.append(alias)
+    save_config(config)
 
+# ── UI ────────────────────────────────────────────────────────────────────────
 def _raw_len(s: str) -> int:
     return len(_ANSI.sub("", s))
 
@@ -306,14 +450,9 @@ def box(lines: list, color: str = C) -> None:
         print(f"{color}  │{RST} {line}{' ' * pad}{color}│{RST}")
     print(f"{color}  ╰{'─' * width}╯{RST}")
 
-def success(msg: str) -> None:
-    print(f"\n  {G}✔{RST}  {msg}\n")
-
-def error(msg: str) -> None:
-    print(f"\n  {R}✘{RST}  {msg}\n")
-
-def info(msg: str) -> None:
-    print(f"  {DIM}{msg}{RST}")
+def success(msg: str) -> None: print(f"\n  {G}✔{RST}  {msg}\n")
+def error(msg: str)   -> None: print(f"\n  {R}✘{RST}  {msg}\n")
+def info(msg: str)    -> None: print(f"  {DIM}{msg}{RST}")
 
 def print_branding(config: dict) -> None:
     print(f"  {DIM}{t(config, 'dev')} {W}{AUTHOR}{RST}")
@@ -324,27 +463,22 @@ def print_branding(config: dict) -> None:
 def get_prompt() -> str:
     user = os.environ.get("USER", os.environ.get("LOGNAME", "user"))
     cwd  = Path.cwd()
-    home = Path.home()
     try:
-        rel = "~" + str(cwd.relative_to(home)) if cwd != home else "~"
+        rel = "~" + str(cwd.relative_to(Path.home())) if cwd != Path.home() else "~"
     except ValueError:
         rel = str(cwd)
-    return f"{G}[{RST}{W}{user}{RST}{G}@{RST}{C}ZER0{RST}{G} {RST}{Y}{rel}{RST}{G}]{RST}{W}\$ {RST}"
+    return f"{G}[{RST}{W}{user}{RST}{G}@{RST}{C}ZER0{RST}{G} {RST}{Y}{rel}{RST}{G}]{RST}{W}$ {RST}"
 
 # ── Selector de idioma con flechas ────────────────────────────────────────────
-
 def pick_lang() -> str:
-    import tty, termios
     options  = [("es", "  Español"), ("en", "  English")]
     selected = 0
 
     def draw():
         sys.stdout.write(f"\033[{len(options)}A")
         for i, (_, label) in enumerate(options):
-            if i == selected:
-                sys.stdout.write(f"\r  {C}▶ {W}{B}{label}{RST}\n")
-            else:
-                sys.stdout.write(f"\r  {DIM}  {label}{RST}\n")
+            line = f"\r  {C}▶ {W}{B}{label}{RST}\n" if i == selected else f"\r  {DIM}  {label}{RST}\n"
+            sys.stdout.write(line)
         sys.stdout.flush()
 
     print(f"\n  {W}{B}{STRINGS['es']['lang_select']}{RST}\n")
@@ -353,9 +487,8 @@ def pick_lang() -> str:
 
     fd  = sys.stdin.fileno()
     old = termios.tcgetattr(fd)
-    sys.stdout.write("\033[?25l")  # ocultar cursor
+    sys.stdout.write("\033[?25l")
     sys.stdout.flush()
-
     try:
         tty.setraw(fd)
         draw()
@@ -364,60 +497,22 @@ def pick_lang() -> str:
             if ch == "\x1b":
                 ch2 = sys.stdin.read(2)
                 if ch2 == "[A" and selected > 0:
-                    selected -= 1
-                    draw()
+                    selected -= 1; draw()
                 elif ch2 == "[B" and selected < len(options) - 1:
-                    selected += 1
-                    draw()
+                    selected += 1; draw()
             elif ch in ("\r", "\n", ""):
                 break
             elif ch == "\x03":
                 raise KeyboardInterrupt
     finally:
         termios.tcsetattr(fd, termios.TCSADRAIN, old)
-        sys.stdout.write("\033[?25h")  # restaurar cursor
+        sys.stdout.write("\033[?25h")
         sys.stdout.flush()
-
     print()
     return options[selected][0]
 
-# ── First Run ─────────────────────────────────────────────────────────────────
-
-def first_run(config: dict) -> None:
-    print(BANNER)
-    print()
-    # Elegir idioma primero
-    lang = pick_lang()
-    config["lang"] = lang
-    print()
-
-    box([
-        t(config, "first_title"),
-        t(config, "first_sub", v=VERSION),
-    ])
-    print()
-    try:
-        name = input(f"  {W}{t(config, 'ask_name')}{RST}  {DIM}›{RST} ").strip()
-    except (KeyboardInterrupt, EOFError):
-        print()
-        sys.exit(0)
-
-    if not name:
-        name = t(config, "default_name")
-
-    config["name"] = name
-    save_config(config)
-
-    print()
-    box([f"  {t(config, 'ready', name=f'{B}{name}{RST}{G}')}"], color=G)
-    print()
-    info(t(config, "tip", help=f"{W}help{RST}{DIM}"))
-    print()
-    print_branding(config)
-
-# ── Welcome ───────────────────────────────────────────────────────────────────
-
-def show_welcome(config: dict) -> None:
+# ── Screens ───────────────────────────────────────────────────────────────────
+def show_banner_welcome(config: dict) -> None:
     print(BANNER)
     print()
     box([
@@ -427,15 +522,42 @@ def show_welcome(config: dict) -> None:
     print()
     print_branding(config)
 
-# ── Commands ──────────────────────────────────────────────────────────────────
+def do_clear(config: dict) -> None:
+    os.system("clear")
+    show_banner_welcome(config)
+    hint = t(config, "hint_help", help=f"{W}help{RST}{DIM}", exit=f"{W}exit{RST}{DIM}")
+    print(f"  {DIM}{hint}{RST}\n")
 
+def first_run(config: dict) -> None:
+    print(BANNER)
+    print()
+    lang = pick_lang()
+    config["lang"] = lang
+    print()
+    box([t(config, "first_title"), t(config, "first_sub", v=VERSION)])
+    print()
+    try:
+        name = input(f"  {W}{t(config, 'ask_name')}{RST}  {DIM}›{RST} ").strip()
+    except (KeyboardInterrupt, EOFError):
+        print(); sys.exit(0)
+    if not name:
+        name = t(config, "default_name")
+    config["name"] = name
+    load_defaults(config)
+    save_config(config)
+    print()
+    box([f"  {t(config, 'ready', name=f'{B}{name}{RST}{G}')}"], color=G)
+    print()
+    info(t(config, "tip", help=f"{W}help{RST}{DIM}"))
+    print()
+    print_branding(config)
+
+# ── Commands ──────────────────────────────────────────────────────────────────
 def list_aliases(config: dict) -> None:
     aliases = config.get("aliases", {})
     if not aliases:
-        info(t(config, "no_aliases"))
-        print()
-        info(t(config, "no_aliases_tip", add=f"{W}add <atajo> <comando>{RST}{DIM}"))
-        print()
+        info(t(config, "no_aliases")); print()
+        info(t(config, "no_aliases_tip", add=f"{W}add <atajo> <comando>{RST}{DIM}")); print()
         return
     print(f"\n  {B}{W}{t(config, 'aliases_title')}{RST}\n")
     max_k = max(len(k) for k in aliases)
@@ -452,8 +574,7 @@ def add_alias(config: dict, alias: str, command: str) -> None:
 
 def remove_alias(config: dict, alias: str) -> None:
     if alias not in config["aliases"]:
-        error(t(config, "alias_not_found", a=alias))
-        return
+        error(t(config, "alias_not_found", a=alias)); return
     del config["aliases"][alias]
     save_config(config)
     success(t(config, "alias_deleted", a=f"{C}{alias}{RST}"))
@@ -462,9 +583,7 @@ def run_alias(config: dict, alias: str, extra_args: list) -> None:
     aliases = config.get("aliases", {})
     if alias not in aliases:
         error(t(config, "cmd_not_found", a=alias))
-        info(t(config, "cmd_not_found_tip", list=f"{W}list{RST}{DIM}"))
-        print()
-        return
+        info(t(config, "cmd_not_found_tip", list=f"{W}list{RST}{DIM}")); print(); return
     cmd = aliases[alias]
     if extra_args:
         cmd += " " + " ".join(extra_args)
@@ -477,9 +596,21 @@ def change_lang(config: dict) -> None:
     print()
     success(t(config, "lang_changed"))
 
+def show_about(config: dict) -> None:
+    print()
+    box([
+        f"  {B}{t(config, 'about_title')}{RST}{C}                    ",
+        f"  {t(config, 'about_version')}    {W}v{VERSION}{RST}{C}             ",
+        f"  {t(config, 'about_dev')}   {W}{AUTHOR}{RST}{C}            ",
+        f"  {t(config, 'about_license')} {W}{MIT}{RST}{C}  ",
+        f"  {t(config, 'about_github')}  {C}{GITHUB}{RST}{C}  ",
+        f"  {t(config, 'about_repo')}   {C}{REPO}{RST}{C}  ",
+    ], color=C)
+    print()
+
 def show_help(config: dict) -> None:
     print(f"\n  {B}{W}{t(config, 'help_title')}{RST}\n")
-    cmds = t(config, "help_cmds")
+    cmds  = t(config, "help_cmds")
     max_c = max(len(c) for c, _ in cmds)
     for cmd, desc in cmds:
         print(f"  {C}  {cmd:<{max_c}}{RST}   {DIM}{desc}{RST}")
@@ -490,12 +621,9 @@ def show_version(config: dict) -> None:
     print_branding(config)
 
 # ── REPL ──────────────────────────────────────────────────────────────────────
-
 def repl(config: dict) -> None:
-    show_welcome(config)
-    hint = t(config, "hint_help",
-             help=f"{W}help{RST}{DIM}",
-             exit=f"{W}exit{RST}{DIM}")
+    show_banner_welcome(config)
+    hint = t(config, "hint_help", help=f"{W}help{RST}{DIM}", exit=f"{W}exit{RST}{DIM}")
     print(f"  {DIM}{hint}{RST}\n")
 
     while True:
@@ -504,40 +632,29 @@ def repl(config: dict) -> None:
         except (KeyboardInterrupt, EOFError):
             print(f"\n\n  {DIM}{t(config, 'goodbye', name=config['name'])}{RST}\n")
             break
-
         if not line:
             continue
-
         parts = line.split()
         cmd   = parts[0].lower()
         args  = parts[1:]
 
-        if cmd in ("exit", "quit", "q"):
-            print(f"\n  {DIM}{t(config, 'goodbye', name=config['name'])}{RST}\n")
-            break
-        elif cmd in ("list", "ls", "-l"):
-            list_aliases(config)
+        if   cmd in ("exit", "quit", "q"):
+            print(f"\n  {DIM}{t(config, 'goodbye', name=config['name'])}{RST}\n"); break
+        elif cmd in ("list", "ls", "-l"):     list_aliases(config)
         elif cmd in ("add", "a"):
-            if len(args) < 2:
-                error(t(config, "usage_add"))
-            else:
-                add_alias(config, args[0], " ".join(args[1:]))
+            if len(args) < 2: error(t(config, "usage_add"))
+            else: add_alias(config, args[0], " ".join(args[1:]))
         elif cmd in ("rm", "remove", "del", "delete"):
-            if not args:
-                error(t(config, "usage_rm"))
-            else:
-                remove_alias(config, args[0])
-        elif cmd == "lang":
-            change_lang(config)
-        elif cmd in ("help", "--help", "-h"):
-            show_help(config)
-        elif cmd in ("version", "--version", "-v"):
-            show_version(config)
-        else:
-            run_alias(config, cmd, args)
+            if not args: error(t(config, "usage_rm"))
+            else: remove_alias(config, args[0])
+        elif cmd in ("clear", "cls", "c"):    do_clear(config)
+        elif cmd == "about":                   show_about(config)
+        elif cmd == "lang":                    change_lang(config)
+        elif cmd in ("help", "--help", "-h"): show_help(config)
+        elif cmd in ("version", "-v"):         show_version(config)
+        else:                                  run_alias(config, cmd, args)
 
-# ── Entry Point ───────────────────────────────────────────────────────────────
-
+# ── Main ──────────────────────────────────────────────────────────────────────
 def main() -> None:
     config = load_config()
     if config.get("name") is None:
@@ -599,7 +716,6 @@ fi
 
 export PATH="$HOME/.local/bin:$PATH"
 
-# ── Resultado ─────────────────────────────────────────────────────────────────
 echo ""
 if command -v zero &>/dev/null; then
     echo -e "  ${G}✔${RST}  ${MSG_ACCESSIBLE}"
