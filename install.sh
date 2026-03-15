@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
 #  ZER0 Installer — Arch Linux
-#  Desarrollado por LogLabs — https://github.com/L0GLabs
+#  Desarrollado por LogLabs — https://github.com/LogLabsGit
 #
 #  Uso:
 #    chmod +x install.sh && ./install.sh
@@ -62,7 +62,7 @@ cat > "$INSTALL_DIR/zero" << 'PYEOF'
 #!/usr/bin/env python3
 """
 ZER0 — Command alias manager for Arch Linux
-Desarrollado por LogLabs — https://github.com/L0GLabs
+Desarrollado por LogLabs — https://github.com/LogLabsGit
 """
 
 import os
@@ -85,10 +85,10 @@ DIM = "\033[2m"
 B   = "\033[1m"
 RST = "\033[0m"
 
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 AUTHOR  = "LogLabs"
-GITHUB  = "https://github.com/L0GLabs"
-REPO    = "https://github.com/L0GLabs/ZER0"
+GITHUB  = "https://github.com/LogLabsGit"
+REPO    = "https://github.com/LogLabsGit/ZER0"
 
 BANNER = f"""
 {R}  ██████╗ ███████╗██████╗  ██████╗ {RST}
@@ -369,5 +369,5 @@ echo -e "    ${W}source ~/.bashrc${RST}  ${DIM}(bash)${RST}"
 echo -e "    ${W}source ~/.zshrc${RST}   ${DIM}(zsh)${RST}"
 echo ""
 echo -e "  ${DIM}Desarrollado por: ${W}LogLabs${RST}"
-echo -e "  ${DIM}Repo: ${C}https://github.com/L0GLabs/ZER0${RST}"
+echo -e "  ${DIM}Repo: ${C}https://github.com/LogLabsGit/ZER0${RST}"
 echo ""
