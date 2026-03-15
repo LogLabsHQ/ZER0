@@ -162,7 +162,7 @@ AUTHOR  = "LogLabs"
 GITHUB  = "https://github.com/LogLabsHQ"
 REPO    = "https://github.com/LogLabsHQ/ZER0"
 MIT     = "MIT License — Copyright (c) 2026 LogLabs"
-WEB     = "https://loglabsgit.github.io/ZER0"
+WEB     = "https://loglabshq.github.io/ZER0/"
 
 BANNER = f"""
 {R}  ██████╗ ███████╗██████╗  ██████╗ {RST}
