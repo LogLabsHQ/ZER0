@@ -1,42 +1,103 @@
 # ZER0
 
-Gestor de alias de comandos para Arch Linux. Escribe menos, haz más.
+<div align="center">
+
+```
+  ██████╗ ███████╗██████╗  ██████╗ 
+  ╚════██╗██╔════╝██╔══██╗██╔═████╗
+   █████╔╝█████╗  ██████╔╝██║██╔██║
+  ██╔═══╝ ██╔══╝  ██╔══██╗████╔╝██║
+  ███████╗███████╗██║  ██║╚██████╔╝
+  ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ 
+```
+
+**Gestor de alias de comandos para Arch Linux.**  
+Escribe menos. Haz más.
+
+![Python](https://img.shields.io/badge/Python-3.10%2B-blue?style=flat-square&logo=python)
+![Platform](https://img.shields.io/badge/Platform-Arch%20Linux-1793d1?style=flat-square&logo=arch-linux)
+![Version](https://img.shields.io/badge/Version-1.0.0-red?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)
+
+</div>
+
+---
+
+## ¿Qué es ZER0?
+
+ZER0 es una herramienta de línea de comandos que te permite guardar alias personalizados para tus comandos más usados. En lugar de escribir `sudo pacman -Syu` cada vez, simplemente defines `zer0 add upd "sudo pacman -Syu"` y desde ese momento ejecutas `zer0 upd`.
+
+Al iniciar, ZER0 te pregunta tu nombre y lo recuerda en cada sesión. Cada vez que lo abras verás el banner con tu nombre y el branding de LogLabs.
+
+---
 
 ## Instalación
 
+### Requisitos
+
+- Arch Linux
+- Python 3.10 o superior
+- `bash`, `zsh` o `fish`
+
+### Pasos
+
 ```bash
-git clone <repo>
-cd zer0
+# 1. Clona el repositorio
+git clone https://github.com/L0GLabs/ZER0.git
+cd ZER0
+
+# 2. Dale permisos al instalador
 chmod +x install.sh
+
+# 3. Instala
 ./install.sh
+
+# 4. Recarga tu shell
+source ~/.bashrc   # bash
+source ~/.zshrc    # zsh
 ```
 
-Reinicia tu terminal y ejecuta:
+El instalador se encarga de todo:
 
-```bash
-zer0
-```
-
-En la primera ejecución ZER0 te preguntará tu nombre y lo recordará siempre.
+- Copia `zer0` y `zero` a `~/.local/bin/` (siempre en tu PATH)
+- Agrega los alias `-Z` y `Z` a tu shell
+- Configura `.bashrc`, `.zshrc` y `config.fish` automáticamente
 
 ---
 
 ## Uso
 
-| Comando                    | Acción                          |
-|----------------------------|---------------------------------|
-| `zer0`                     | Pantalla de bienvenida          |
-| `zer0 list`                | Listar todos los atajos         |
-| `zer0 add <atajo> <cmd>`   | Agregar o actualizar un atajo   |
-| `zer0 rm  <atajo>`         | Eliminar un atajo               |
-| `zer0 <atajo> [args…]`     | Ejecutar un atajo               |
-| `zer0 help`                | Mostrar ayuda                   |
-| `zer0 version`             | Mostrar versión                 |
-
-### Ejemplos
+Una vez instalado, puedes invocar ZER0 de cualquiera de estas formas desde **cualquier carpeta**:
 
 ```bash
-# Agregar atajos
+zer0
+zero
+Z
+-Z
+```
+
+Todas abren la pantalla de bienvenida.
+
+---
+
+## Comandos
+
+| Comando | Descripción |
+|---|---|
+| `zer0` / `zero` / `Z` / `-Z` | Pantalla de bienvenida |
+| `zer0 list` | Listar todos los atajos guardados |
+| `zer0 add <atajo> <comando>` | Agregar o actualizar un atajo |
+| `zer0 rm <atajo>` | Eliminar un atajo |
+| `zer0 <atajo> [args…]` | Ejecutar un atajo |
+| `zer0 help` | Mostrar ayuda |
+| `zer0 version` | Mostrar versión |
+
+---
+
+## Ejemplos
+
+```bash
+# Guardar atajos
 zer0 add upd  "sudo pacman -Syu"
 zer0 add cls  "clear"
 zer0 add gs   "git status"
@@ -44,14 +105,14 @@ zer0 add gp   "git push origin main"
 zer0 add py   "python3"
 
 # Ejecutarlos
-zer0 upd            # → sudo pacman -Syu
-zer0 gp             # → git push origin main
-zer0 py script.py   # → python3 script.py  (pasa argumentos extra)
+zer0 upd             # → sudo pacman -Syu
+zer0 gs              # → git status
+zer0 py script.py    # → python3 script.py  (pasa argumentos extra)
 
-# Listar
+# Ver todos los atajos
 zer0 list
 
-# Eliminar
+# Eliminar uno
 zer0 rm cls
 ```
 
@@ -59,17 +120,17 @@ zer0 rm cls
 
 ## Configuración
 
-El archivo de configuración se guarda en:
+ZER0 guarda todo en un archivo JSON en:
 
 ```
 ~/.config/zer0/config.json
 ```
 
-Ejemplo:
+Ejemplo del archivo:
 
 ```json
 {
-  "name": "Nombre",
+  "name": "Tu Nombre",
   "aliases": {
     "upd": "sudo pacman -Syu",
     "gs": "git status",
@@ -78,22 +139,40 @@ Ejemplo:
 }
 ```
 
+Puedes editarlo manualmente si lo prefieres.
+
 ---
 
-## Invocaciones equivalentes
+## Estructura del proyecto
 
-Todas estas formas abren la bienvenida:
-
-```bash
-zer0
-zer0 open
-zer0 start
-zer0 -z
+```
+ZER0/
+├── zer0.py       # Programa principal
+├── install.sh    # Instalador
+└── README.md     # Este archivo
 ```
 
 ---
 
-## Requisitos
+## Desinstalar
 
-- Python 3.10+
-- Arch Linux (compatible con bash / zsh / fish)
+```bash
+rm ~/.local/bin/zer0
+rm ~/.local/bin/zero
+rm -rf ~/.config/zer0
+```
+
+Y elimina manualmente el bloque `# ─── ZER0 ───` de tu `.bashrc` / `.zshrc`.
+
+---
+
+## Desarrollado por
+
+<div align="center">
+
+**LogLabs**
+
+[![GitHub](https://img.shields.io/badge/GitHub-L0GLabs-181717?style=flat-square&logo=github)](https://github.com/L0GLabs)
+[![Repo](https://img.shields.io/badge/Repo-ZER0-red?style=flat-square&logo=github)](https://github.com/L0GLabs/ZER0)
+
+</div>
